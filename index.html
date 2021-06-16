@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Intro a la programación en R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="  Creative Commons Attribution 4.0 International License" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Intro a la programación en R
+## Diploma y Maestría en Demografía FCS <br> Gabriela Mathieu <br> Junio 2021
+### <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br /> <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+
+---
+
+
+
+
+
+
+# ¿Qué haremos hoy?
+
+- **Repaso** del primer taller 
+&lt;br&gt;
+--
+
+- Trabajar en **proyecto** (.Rproj)
+&lt;br&gt;
+--
+
+- Definir una función para encontrar un **dato faltante**
+&lt;br&gt;
+--
+
+- Definir una función para encontrar un **caso duplicado**
+&lt;br&gt;
+--
+
+- Introducción al paquete **dplyr** para profundizar en el análisis de los datos de gapminder
+&lt;br&gt;
+--
+
+- **Operadores** lógicos y de comparación. Operador `%in%`
+&lt;br&gt;
+--
+
+
+---
+# Trabajar en proyecto
+
+.pull-left[
+
+Permite ordenar los diferentes archivos de un análisis y prescindir de usar setwd() y/o escribir rutas larguísimas o que incluyen tildes o ñ. 
+
+Si el archivo `tesis.Rproj` está ubicado en: `/home/calcita/Escritorio/tesis`, todos los archivos que estén en la carpeta tesis voy a poder cargarlos sin definir una ruta del archivo. 
+
+
+```r
+df &lt;- read_csv("datos.csv")
+```
+
+]
+
+.pull-right[
+&lt;img src="img/fd1.png" width="70%" /&gt;
+
+]
+
+---
+# Crear proyecto
+&lt;img src="img/create_project2.gif" width="60%" style="display: block; margin: auto;" /&gt;
+
+&lt;!-- ![]() --&gt;
+
+---
+# Cargar proyecto
+
+Doble click sobre el archivo .RProj
+
+&lt;img src="img/load_project2.gif" width="60%" style="display: block; margin: auto;" /&gt;
+
+&lt;!-- ![](img/load_project.gif) --&gt;
+---
+# Acceder a archivos del proyecto
+
+Uso la tecla `tab` para autocompletar una ruta 
+
+&lt;img src="img/read_project2.gif" width="60%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ![](img/read_project.gif) --&gt;
+&lt;!-- --- --&gt;
+&lt;!-- # Estructura de un proyecto  --&gt;
+
+&lt;!-- Una buena práctica es estructurar dichos archivos con cierta lógica que permita a otra persona entender qué es cada cosa y a la propia persona que lo hizo en un futuro.  --&gt;
+
+
+---
+# Importo los datos de gapminder
+
+Es una nueva sesión así que no tengo los objetos en memoria que tenía ayer.
+
+Voy a usar la función `read_csv` del paquete `readr`. Hay dos maneras de hacerlo:
+
+
+```r
+library(readr) # cargo el paquete
+pop &lt;- read_csv("data/gapminder.csv") #importo los datos
+```
+O en una sola línea
+
+
+```r
+#importo los datos indicando de que paquete es la función
+pop &lt;- readr::read_csv("data/gapminder.csv") 
+```
+En esta segunda opción no queda cargado el paquete, pero como solo voy a usarlo en esta línea no me importa.
+
+---
+# Datos faltantes (NA)
+
+- La función &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;is.na()&lt;/span&gt; chequea si hay un dato faltante (&lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;NA: not available&lt;/span&gt;) para cada elemento de un vector. 
+&lt;br&gt;&lt;br&gt;
+--
+
+
+
+```r
+*x &lt;- c(-22, 4, -1, 8, NA)
+x
+```
+
+```
+[1] -22   4  -1   8  NA
+```
+- ¿Cuántos datos faltantes tiene x?
+--
+
+- Devuelve un &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;vector lógico&lt;/span&gt;, donde el TRUE indica que no hay dato y el FALSE que sí hay dato.
+
+
+```r
+*is.na(x)
+```
+
+```
+[1] FALSE FALSE FALSE FALSE  TRUE
+```
+---
+# Ejemplo: Datos faltantes (NA)
+
+
+
+
+```r
+faltantes &lt;- is.na(pop$lifeExp)
+head(faltantes) # me muestra los primeros 6 valores/casos
+```
+
+```
+[1] FALSE FALSE FALSE FALSE FALSE FALSE
+```
+--
+
+- ¿Cuántos son los valores faltantes de  `lifeExp`?
+
+
+```r
+*sum(faltantes)
+```
+
+```
+[1] 0
+```
+
+El valor lógico &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;TRUE&lt;/span&gt; representa al &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;1&lt;/span&gt; y el valor &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;FALSE&lt;/span&gt; representa al &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;0&lt;/span&gt; por eso puedo usar la función &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;sum()&lt;/span&gt;. 
+
+---
+# Observaciones duplicadas
+
+La función &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;duplicated()&lt;/span&gt; determina cuales elementos de un vector o data frame están duplicados, devuelve un vector lógico: TRUE si es duplicado y FALSE en caso contrario.
+&lt;br&gt;&lt;br&gt;
+--
+
+- &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;Compara un elemento del vector con todos los anteriores&lt;/span&gt;, va asignando el valor FALSE hasta que se encuentra con un caso duplicado y en este caso le asigna TRUE y sigue comparando. 
+
+
+
+```r
+*x &lt;- c(-22, 4, 8, 8, NA)
+x
+```
+
+```
+[1] -22   4   8   8  NA
+```
+--
+
+```r
+*duplicated(x)
+```
+
+```
+[1] FALSE FALSE FALSE  TRUE FALSE
+```
+
+---
+# Ejemplo: observaciones duplicadas
+
+
+- Chequeo que haya algún &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;caso duplicado&lt;/span&gt;, reviso todas las variables
+
+```r
+*repetidos &lt;- duplicated(pop) # el argumento es el data frame
+*sum(repetidos) # los sumo, recordar: TRUE es 1 y FALSE es 0
+```
+
+```
+[1] 0
+```
+
+- Chequeo que haya algún &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;valor duplicado&lt;/span&gt;  en la &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;variable identificatoria de cada caso&lt;/span&gt;
+
+
+```r
+*repetidos &lt;- duplicated(pop$country) # el argumento es una variable
+*sum(repetidos)
+```
+
+```
+[1] 1562
+```
+
+Si nombro a un objeto igual a uno existente, lo sobreescribo.
+
+---
+class: inverse, center, middle
+# dplyr
+
+---
+# Manipular datos con dplyr
+
+
+- El paquete dplyr permite representar la información de un &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;data frame&lt;/span&gt; en forma de &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;tabla&lt;/span&gt;, donde cada fila representa una observación y cada columna represente una variable.
+&lt;br&gt;&lt;br&gt;
+--
+
+- dplyr no provee ninguna funcionalidad que no pueda ser realizada con las funciones del paquete base, sin embargo, es más simple y rápido (está escrito en C++).
+&lt;br&gt;&lt;br&gt;
+--
+
+- Todas las funciones del paquete tiene la particularidad de que su  &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;primer argumento es un data frame&lt;/span&gt; al que le realizará la operación, mientras que los subsiguiente argumentos describen como realizar tal operación. 
+
+- Finalmente el &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;resultado&lt;/span&gt; de todas estas funciones es un nuevo &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;data frame&lt;/span&gt;. Esto no ocurre con las funciones de base. 
+
+---
+class: center, middle
+# ~~Base R vs. Tidyverse~~
+
+![](img/base_tidy.png)
+---
+# Instalar y cargar dplyr
+
+- La instalación es por única vez en una computadora. 
+
+```r
+# install.packages("dplyr") 
+```
+- Comenté esa línea porque ya lo tengo instalado
+--
+
+- En cada nueva sesión de RStudio lo debo cargar para poder usar sus funciones
+
+
+```r
+*library(dplyr)
+```
+
+![](img/alert.png) Notar que en la función de instalación el nombre del paquete se escribe entre comillas pero en la función de carga va sin comillas. No hagas ~~library("dplyr")~~.
+
+
+---
+# Manipular datos
+
+- &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;Seleccionar&lt;/span&gt; columnas/variables
+&lt;br&gt;&lt;br&gt;
+--
+
+- &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;Renombrar&lt;/span&gt; variables
+&lt;br&gt;&lt;br&gt;
+--
+
+- &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;Transformar&lt;/span&gt; variables
+&lt;br&gt;&lt;br&gt;
+--
+
+- &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;Crear&lt;/span&gt; nuevas variables
+&lt;br&gt;&lt;br&gt;
+--
+
+- &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;Filtrar&lt;/span&gt; o eliminar observaciones
+&lt;br&gt;&lt;br&gt;
+--
+
+- Chequear existencia de observaciones duplicadas
+&lt;br&gt;&lt;br&gt;
+--
+
+- Chequear existencia de datos faltantes
+&lt;br&gt;&lt;br&gt;
+--
+
+- Reestructurar los datos
+
+---
+class: inverse, center, middle
+# dplyr::select()
+
+---
+# Seleccionar columnas/variables 
+
+- La función &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;select()&lt;/span&gt;  selecciona columnas de un data frame
+--
+
+- El primer argumento es el data frame y luego la(s) variable(s) separadas por coma.
+--
+
+- `select`(&lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;dataframe&amp;gt;&lt;/span&gt;, &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;variable&amp;gt;&lt;/span&gt;) 
+&lt;br&gt;
+--
+
+.pull-left[
+
+```r
+*select(pop, country)
+```
+
+```
+# A tibble: 1,704 x 1
+   country    
+   &lt;chr&gt;      
+ 1 Afghanistan
+ 2 Afghanistan
+ 3 Afghanistan
+ 4 Afghanistan
+ 5 Afghanistan
+ 6 Afghanistan
+ 7 Afghanistan
+ 8 Afghanistan
+ 9 Afghanistan
+10 Afghanistan
+# … with 1,694 more rows
+```
+]
+.pull-rigth[
+
+
+```r
+*select(pop, country, year)
+```
+
+```
+# A tibble: 1,704 x 2
+   country      year
+   &lt;chr&gt;       &lt;dbl&gt;
+ 1 Afghanistan  1952
+ 2 Afghanistan  1957
+ 3 Afghanistan  1962
+ 4 Afghanistan  1967
+ 5 Afghanistan  1972
+ 6 Afghanistan  1977
+ 7 Afghanistan  1982
+ 8 Afghanistan  1987
+ 9 Afghanistan  1992
+10 Afghanistan  1997
+# … with 1,694 more rows
+```
+]
+
+Las funciones de tidyverse permiten llamar a las variables de un data frame sin usar comillas pero esto no es aplicable al resto de los paquetes de R, incluido los del base.
+
+---
+# Seleccionar columnas/variables 
+
+.pull-left[
+Seleccionar un rango de columnas: select(&lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;df&amp;gt;&lt;/span&gt;, &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;desde&amp;gt;:&amp;lt;hasta&amp;gt;&lt;/span&gt;)
+
+
+```r
+select(pop, year:gdpPercap)
+```
+
+```
+# A tibble: 1,704 x 4
+    year lifeExp      pop gdpPercap
+   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+ 1  1952    28.8  8425333      779.
+ 2  1957    30.3  9240934      821.
+ 3  1962    32.0 10267083      853.
+ 4  1967    34.0 11537966      836.
+ 5  1972    36.1 13079460      740.
+ 6  1977    38.4 14880372      786.
+ 7  1982    39.9 12881816      978.
+ 8  1987    40.8 13867957      852.
+ 9  1992    41.7 16317921      649.
+10  1997    41.8 22227415      635.
+# … with 1,694 more rows
+```
+
+]
+.pull-right[
+Seleccionar todas las columnas menos una: select(&lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;df&amp;gt;&lt;/span&gt;, &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;-&amp;lt;variable&amp;gt;&lt;/span&gt;)
+
+
+
+```r
+select(pop, -gdpPercap)
+```
+
+```
+# A tibble: 1,704 x 5
+   country     continent  year lifeExp      pop
+   &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333
+ 2 Afghanistan Asia       1957    30.3  9240934
+ 3 Afghanistan Asia       1962    32.0 10267083
+ 4 Afghanistan Asia       1967    34.0 11537966
+ 5 Afghanistan Asia       1972    36.1 13079460
+ 6 Afghanistan Asia       1977    38.4 14880372
+ 7 Afghanistan Asia       1982    39.9 12881816
+ 8 Afghanistan Asia       1987    40.8 13867957
+ 9 Afghanistan Asia       1992    41.7 16317921
+10 Afghanistan Asia       1997    41.8 22227415
+# … with 1,694 more rows
+```
+
+]
+
+---
+class: inverse, center, middle
+# dplyr::slice()
+
+---
+# Seleccionar filas/observaciones por su posición
+
+
+
+- La función &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;slice()&lt;/span&gt; selecciona observaciones/filas según su posición. 
+--
+
+- Esto no es robusto a un reordenamiento de las observaciones. Sirve para "ver" algunos casos.
+&lt;br&gt;
+--
+
+- `slice`(&lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;df&amp;gt;&lt;/span&gt;, &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;nro_variable&amp;gt;&lt;/span&gt;, &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;nro_variable&amp;gt;&lt;/span&gt;)
+--
+
+.pull-left[
+
+```r
+# selecciono las filas 1 y 5
+*slice(pop, 1, 5)
+```
+
+```
+# A tibble: 2 x 5
+  country     continent  year lifeExp      pop
+  &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+1 Afghanistan Asia       1952    28.8  8425333
+2 Afghanistan Asia       1972    36.1 13079460
+```
+]
+
+
+.pull-right[
+
+```r
+# selecciono las filas de 1 a 5
+*slice(pop, 1:5)
+```
+
+```
+# A tibble: 5 x 5
+  country     continent  year lifeExp      pop
+  &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+1 Afghanistan Asia       1952    28.8  8425333
+2 Afghanistan Asia       1957    30.3  9240934
+3 Afghanistan Asia       1962    32.0 10267083
+4 Afghanistan Asia       1967    34.0 11537966
+5 Afghanistan Asia       1972    36.1 13079460
+```
+
+]
+
+---
+class: inverse, center, middle
+# dplyr::filter()
+
+---
+# Selecciona observaciones según condición
+
+- La función &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;filter()&lt;/span&gt; selecciona observaciones/filas según una condición.
+--
+
+- Puede ser una condición que involucre a una o varias variables. Condiciono a que tome o no tome ciertos valores.
+--
+
+- `filter`(&lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;df&amp;gt;&lt;/span&gt;, &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;condicion&amp;gt;&lt;/span&gt;)
+
+
+```r
+*menor35 &lt;- filter(pop, lifeExp &lt; 35) # me quedo con los casos cuyo precio es menor a 35
+menor35
+```
+
+```
+# A tibble: 33 x 5
+   country      continent  year lifeExp      pop
+   &lt;chr&gt;        &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Afghanistan  Asia       1952    28.8  8425333
+ 2 Afghanistan  Asia       1957    30.3  9240934
+ 3 Afghanistan  Asia       1962    32.0 10267083
+ 4 Afghanistan  Asia       1967    34.0 11537966
+ 5 Angola       Africa     1952    30.0  4232095
+ 6 Angola       Africa     1957    32.0  4561361
+ 7 Angola       Africa     1962    34    4826015
+ 8 Burkina Faso Africa     1952    32.0  4469979
+ 9 Burkina Faso Africa     1957    34.9  4713416
+10 Cambodia     Asia       1977    31.2  6978607
+# … with 23 more rows
+```
+
+---
+class: inverse, center, middle
+# Operadores comparativos
+
+---
+# Operadores de comparación 
+
+.pull-left[
+Mayor que: &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;gt;&lt;/span&gt;
+
+
+```r
+*filter(pop, lifeExp &gt; 70)
+```
+
+```
+# A tibble: 493 x 5
+   country   continent  year lifeExp      pop
+   &lt;chr&gt;     &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Albania   Europe     1982    70.4  2780097
+ 2 Albania   Europe     1987    72    3075321
+ 3 Albania   Europe     1992    71.6  3326498
+ 4 Albania   Europe     1997    73.0  3428038
+ 5 Albania   Europe     2002    75.7  3508512
+ 6 Albania   Europe     2007    76.4  3600523
+ 7 Algeria   Africa     2002    71.0 31287142
+ 8 Algeria   Africa     2007    72.3 33333216
+ 9 Argentina Americas   1987    70.8 31620918
+10 Argentina Americas   1992    71.9 33958947
+# … with 483 more rows
+```
+
+]
+.pull-rigth[
+&lt;br&gt;
+Mayor igual que: &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;gt;=&lt;/span&gt;
+
+
+```r
+*filter(pop, lifeExp &gt;= 70)
+```
+
+```
+# A tibble: 494 x 5
+   country   continent  year lifeExp      pop
+   &lt;chr&gt;     &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Albania   Europe     1982    70.4  2780097
+ 2 Albania   Europe     1987    72    3075321
+ 3 Albania   Europe     1992    71.6  3326498
+ 4 Albania   Europe     1997    73.0  3428038
+ 5 Albania   Europe     2002    75.7  3508512
+ 6 Albania   Europe     2007    76.4  3600523
+ 7 Algeria   Africa     2002    71.0 31287142
+ 8 Algeria   Africa     2007    72.3 33333216
+ 9 Argentina Americas   1987    70.8 31620918
+10 Argentina Americas   1992    71.9 33958947
+# … with 484 more rows
+```
+
+]
+
+---
+# Operadores de comparación 
+
+.pull-left[
+Menor que: &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;&lt;/span&gt;
+
+
+```r
+*filter(pop, lifeExp &lt; 70)
+```
+
+```
+# A tibble: 1,210 x 5
+   country     continent  year lifeExp      pop
+   &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333
+ 2 Afghanistan Asia       1957    30.3  9240934
+ 3 Afghanistan Asia       1962    32.0 10267083
+ 4 Afghanistan Asia       1967    34.0 11537966
+ 5 Afghanistan Asia       1972    36.1 13079460
+ 6 Afghanistan Asia       1977    38.4 14880372
+ 7 Afghanistan Asia       1982    39.9 12881816
+ 8 Afghanistan Asia       1987    40.8 13867957
+ 9 Afghanistan Asia       1992    41.7 16317921
+10 Afghanistan Asia       1997    41.8 22227415
+# … with 1,200 more rows
+```
+
+]
+.pull-rigth[
+&lt;br&gt;
+Menor igual que: &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;=&lt;/span&gt;
+
+
+```r
+*filter(pop, lifeExp &lt;= 70)
+```
+
+```
+# A tibble: 1,211 x 5
+   country     continent  year lifeExp      pop
+   &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333
+ 2 Afghanistan Asia       1957    30.3  9240934
+ 3 Afghanistan Asia       1962    32.0 10267083
+ 4 Afghanistan Asia       1967    34.0 11537966
+ 5 Afghanistan Asia       1972    36.1 13079460
+ 6 Afghanistan Asia       1977    38.4 14880372
+ 7 Afghanistan Asia       1982    39.9 12881816
+ 8 Afghanistan Asia       1987    40.8 13867957
+ 9 Afghanistan Asia       1992    41.7 16317921
+10 Afghanistan Asia       1997    41.8 22227415
+# … with 1,201 more rows
+```
+
+]
+
+---
+# Operadores de comparación 
+
+.pull-left[
+Igual que: &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;==&lt;/span&gt;
+
+
+```r
+*filter(pop, lifeExp == 70)
+```
+
+```
+# A tibble: 1 x 5
+  country          continent  year lifeExp     pop
+  &lt;chr&gt;            &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1 Hong Kong, China Asia       1967      70 3722800
+```
+
+]
+.pull-rigth[
+&lt;br&gt;
+Diferente que: &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;!=&lt;/span&gt;
+
+
+```r
+*filter(pop, lifeExp != 70)
+```
+
+```
+# A tibble: 1,703 x 5
+   country     continent  year lifeExp      pop
+   &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333
+ 2 Afghanistan Asia       1957    30.3  9240934
+ 3 Afghanistan Asia       1962    32.0 10267083
+ 4 Afghanistan Asia       1967    34.0 11537966
+ 5 Afghanistan Asia       1972    36.1 13079460
+ 6 Afghanistan Asia       1977    38.4 14880372
+ 7 Afghanistan Asia       1982    39.9 12881816
+ 8 Afghanistan Asia       1987    40.8 13867957
+ 9 Afghanistan Asia       1992    41.7 16317921
+10 Afghanistan Asia       1997    41.8 22227415
+# … with 1,693 more rows
+```
+
+]
+
+---
+class: inverse, center, middle
+# Operadores lógicos
+
+---
+# Operadores lógicos
+
+O lógico:  &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;|&lt;/span&gt;
+
+
+```r
+# selecciono casos cuya expectiva de vida es menor a 30 o mayor a 80
+*filter(pop, lifeExp &lt; 30 | lifeExp &gt; 80)
+```
+
+```
+# A tibble: 23 x 5
+   country          continent  year lifeExp      pop
+   &lt;chr&gt;            &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Afghanistan      Asia       1952    28.8  8425333
+ 2 Australia        Oceania    2002    80.4 19546792
+ 3 Australia        Oceania    2007    81.2 20434176
+ 4 Canada           Americas   2007    80.7 33390141
+ 5 France           Europe     2007    80.7 61083916
+ 6 Hong Kong, China Asia       2002    81.5  6762476
+ 7 Hong Kong, China Asia       2007    82.2  6980412
+ 8 Iceland          Europe     2002    80.5   288030
+ 9 Iceland          Europe     2007    81.8   301931
+10 Israel           Asia       2007    80.7  6426679
+# … with 13 more rows
+```
+
+
+---
+# Operadores lógicos
+
+Y lógico:  &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;amp;&lt;/span&gt; 
+
+
+```r
+# selecciono casos con expectativa de vida al nacer menor a 40 y del continente americano 
+*filter(pop, lifeExp &lt; 40 &amp; continent == "Americas")
+```
+
+```
+# A tibble: 1 x 5
+  country continent  year lifeExp     pop
+  &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1 Haiti   Americas   1952    37.6 3201488
+```
+--
+
+---
+# Operadores lógicos
+
+No lógico: &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;!&lt;/span&gt;
+
+
+```r
+# selecciono paises cuya expectativa de via no es 70 
+*filter(pop, !lifeExp == 70)
+```
+
+```
+# A tibble: 1,703 x 5
+   country     continent  year lifeExp      pop
+   &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333
+ 2 Afghanistan Asia       1957    30.3  9240934
+ 3 Afghanistan Asia       1962    32.0 10267083
+ 4 Afghanistan Asia       1967    34.0 11537966
+ 5 Afghanistan Asia       1972    36.1 13079460
+ 6 Afghanistan Asia       1977    38.4 14880372
+ 7 Afghanistan Asia       1982    39.9 12881816
+ 8 Afghanistan Asia       1987    40.8 13867957
+ 9 Afghanistan Asia       1992    41.7 16317921
+10 Afghanistan Asia       1997    41.8 22227415
+# … with 1,693 more rows
+```
+
+---
+class: inverse, center, middle
+# %in%
+
+---
+# Operador %in%
+
+- &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;Compara cada elemento&lt;/span&gt; de un vector con los elementos de otro vector.
+--
+
+- &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;x&amp;gt; %in% &amp;lt;y&amp;gt;&lt;/span&gt;, el primer elemento de x se compara con todos los elementos de y, el segundo elemento de x se compara con todos los elementos de y, así sucesivamente. 
+--
+
+- Devuelve un TRUE o un FALSE en cada comparación. TRUE cuando el elemento de x está en y, FALSE en caso contrario.
+--
+
+- Cuando lo uso en `filter()` se queda con los TRUE. 
+
+
+```r
+# selecciono casos cuyo continente es América o Asia
+filter(pop, continent %in% c("Americas", "Asia"))
+```
+
+```
+# A tibble: 696 x 5
+   country     continent  year lifeExp      pop
+   &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333
+ 2 Afghanistan Asia       1957    30.3  9240934
+ 3 Afghanistan Asia       1962    32.0 10267083
+ 4 Afghanistan Asia       1967    34.0 11537966
+ 5 Afghanistan Asia       1972    36.1 13079460
+ 6 Afghanistan Asia       1977    38.4 14880372
+ 7 Afghanistan Asia       1982    39.9 12881816
+ 8 Afghanistan Asia       1987    40.8 13867957
+ 9 Afghanistan Asia       1992    41.7 16317921
+10 Afghanistan Asia       1997    41.8 22227415
+# … with 686 more rows
+```
+
+En este caso es lo mismo que:
+
+```r
+# selecciono casos de América o Asia
+filter(pop, continent == "Americas" | continent == "Asia")
+```
+
+```
+# A tibble: 696 x 5
+   country     continent  year lifeExp      pop
+   &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 Afghanistan Asia       1952    28.8  8425333
+ 2 Afghanistan Asia       1957    30.3  9240934
+ 3 Afghanistan Asia       1962    32.0 10267083
+ 4 Afghanistan Asia       1967    34.0 11537966
+ 5 Afghanistan Asia       1972    36.1 13079460
+ 6 Afghanistan Asia       1977    38.4 14880372
+ 7 Afghanistan Asia       1982    39.9 12881816
+ 8 Afghanistan Asia       1987    40.8 13867957
+ 9 Afghanistan Asia       1992    41.7 16317921
+10 Afghanistan Asia       1997    41.8 22227415
+# … with 686 more rows
+```
+
+---
+# Ejercicio (12')
+
+- Selecciona los casos que tienen entre de 20 y 40 años de expectativa de vida al nacer y guarda en un objeto llamado `countries_20_40`.
+&lt;!-- review_10_20 &lt;- filter(pop, number_of_reviews &gt;= 10 &amp; number_of_reviews &lt;= 20) --&gt;
+
+- Selecciona los casos que tienen solo 30 ó 70 años de expectativa de vida y guarda en un objeto llamado `lifeExp_30_70`.
+&lt;!-- availability_3_5 &lt;- filter(pop, availability_365 %in% c(3,5)) --&gt;
+&lt;!-- availability_3_5 &lt;- filter(pop, availability_365 == 3 | availability_365 == 5) --&gt;
+
+- Selecciona los últimos 5 casos de pop y guarda en un objeto llamado `last_5`.
+&lt;!-- last_5 &lt;- slice(pop, (nrow(pop)-4):nrow(pop)) --&gt;
+ &lt;!-- last_5 &lt;- slice_tail(pop, n = 5) --&gt;
+ 
+- Selecciona las variables country y continent y guarda en un objeto llamado `country_continent`. 
+&lt;!-- reviews_name &lt;- pop %&gt;% select(contains("review")) --&gt;
+
+- ¿Cuál es el caso (país/año) con mayor expectativa de vida al nacer? Ver &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;?slice_max&lt;/span&gt;
+&lt;!-- select(slice_max(pop, lifeExp), country, year)  --&gt;
+
+
+---
+class: inverse, center, middle
+# dplyr::arrange()
+
+---
+# Ordenar las observaciones según una variable
+
+
+
+La función &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;arrange()&lt;/span&gt; &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;ordena&lt;/span&gt; un data frame de acuerdo a una(s) variable(s) de manera &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;creciente&lt;/span&gt; por defecto.
+--
+
+
+```r
+*arrange(pop, year)
+```
+--
+
+Para ordenar de manera &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;decreciente&lt;/span&gt; debo incluir la función &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;desc()&lt;/span&gt;:
+
+```r
+*arrange(pop, desc(year))
+```
+--
+Para ordenar por más de una variable:
+
+```r
+arrange(pop, desc(year), lifeExp)
+```
+
+---
+class: inverse, center, middle
+# dplyr::summarise()
+
+---
+# Calcular un resumen de una variable
+
+- La función &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;summarise()&lt;/span&gt; o &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;summarize()&lt;/span&gt; calcula un resumen de variables
+
+- summarise(&lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;df&amp;gt;&lt;/span&gt;, &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;column&amp;gt;&lt;/span&gt; = &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;function&amp;gt;&lt;/span&gt;(&lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;variable&amp;gt;&lt;/span&gt;))
+
+- El resultado será una data frame con una fila, a menos que los datos estén agrupados, y una columna por cada estadístico de resumen.
+
+
+```r
+*summarise(pop, promedio = mean(lifeExp))
+```
+
+```
+# A tibble: 1 x 1
+  promedio
+     &lt;dbl&gt;
+1     59.5
+```
+
+- Se puede utilizar cualquier función que cumpla con que lo datos de entrada sean numericos y como salida se entregue una constante. Por ejemplo las funciones de resumen que vimos de R base: `mean`(), `max`(), `min`(), `median`(), `var`(), `sd`(), `sum`(), etc. Existen otras específicas de `dplyr` que iremos viendo.
+
+---
+# Calcular un resumen de una variable
+
+- Se pueden aplicar diferentes funciones a la misma o diferentes variables
+
+
+```r
+# la función n() devuelve la cantidad de observaciones
+*summarise(pop, promedio = mean(lifeExp), varianza = var(lifeExp), total = n())
+```
+
+```
+# A tibble: 1 x 3
+  promedio varianza total
+     &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;
+1     59.5     167.  1704
+```
+
+- Suele ser más claro escribirlo hacia abajo
+
+
+```r
+*summarise(pop, promedio = mean(lifeExp),
+*              varianza = var(lifeExp),
+*              total = n())
+```
+
+&lt;!-- n() - gives the number of observations --&gt;
+&lt;!-- n_distinct(var) - gives the numbers of unique values of var --&gt;
+
+---
+class: inverse, center, middle
+# dplyr::count()
+
+---
+# Cálculo frecuencias de una variable
+
+- La función &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;count()&lt;/span&gt; es la función de dplyr para hacer una tabla de frecuencias, el resultado es siempre un data frame de menor dimensión que el original.
+--
+
+- count(&lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;df&amp;gt;&lt;/span&gt;, &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;variable&amp;gt;&lt;/span&gt;)
+--
+
+- En R base usamos `table()` pero el resultado no es un data frame y la salida no es muy amigable.
+--
+
+
+--
+
+.pull-left[
+
+```r
+*count(pop,  continent)
+```
+
+```
+# A tibble: 5 x 2
+  continent     n
+  &lt;chr&gt;     &lt;int&gt;
+1 Africa      624
+2 Americas    300
+3 Asia        396
+4 Europe      360
+5 Oceania      24
+```
+]
+
+--
+
+.pull-right[
+
+```r
+*count(pop, continent, country)
+```
+
+```
+# A tibble: 142 x 3
+   continent country                      n
+   &lt;chr&gt;     &lt;chr&gt;                    &lt;int&gt;
+ 1 Africa    Algeria                     12
+ 2 Africa    Angola                      12
+ 3 Africa    Benin                       12
+ 4 Africa    Botswana                    12
+ 5 Africa    Burkina Faso                12
+ 6 Africa    Burundi                     12
+ 7 Africa    Cameroon                    12
+ 8 Africa    Central African Republic    12
+ 9 Africa    Chad                        12
+10 Africa    Comoros                     12
+# … with 132 more rows
+```
+
+]
+
+---
+class: inverse, center, middle
+# dplyr::mutate()
+
+---
+# Calculo una nueva variable 
+
+- La función &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;mutate()&lt;/span&gt; permite calcular nuevas variables
+--
+
+- mutate(&lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;df&amp;gt;&lt;/span&gt;, &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;nombre&amp;gt;&lt;/span&gt; = &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;calculo&amp;gt;&lt;/span&gt;)
+--
+
+- El resultado será de la &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;misma cantidad de observaciones&lt;/span&gt; que el data frame original
+--
+
+- Conviene guardarlo en el mismo objeto  (data frame original)
+--
+
+
+```r
+*pop &lt;- mutate(pop, evn = round(lifeExp, digits = 1))
+slice(pop, 1:4)
+```
+
+```
+# A tibble: 4 x 7
+  country     continent  year lifeExp      pop gdpPercap   evn
+  &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
+1 Afghanistan Asia       1952    28.8  8425333      779.  28.8
+2 Afghanistan Asia       1957    30.3  9240934      821.  30.3
+3 Afghanistan Asia       1962    32.0 10267083      853.  32  
+4 Afghanistan Asia       1967    34.0 11537966      836.  34  
+```
+
+---
+# Ejercicio (5')
+
+- Calcula la variable `exp_vida_nacer` redondeada a dos dígitos.
+
+- ¿Cuál es el máximo y mínimo de expectativa de vida al nacer que registra un país?
+
+
+---
+# Agrupo los casos por cierta variable
+
+
+
+- La función &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;group_by()&lt;/span&gt; permite agrupar las observaciones por cierta variable.
+--
+
+- Permite hacer operaciones por grupos para posteriormente realizar otros cálculos.
+--
+
+- group_by(&lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;df&amp;gt;&lt;/span&gt;, &lt;span style=" font-weight: bold;    border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #b3e2cd !important;" &gt;&amp;lt;variable&amp;gt;&lt;/span&gt;)
+--
+
+
+```r
+*pop_gr &lt;- group_by(pop, continent)
+*summarise(pop_gr, promedio = mean(lifeExp))
+```
+
+```
+# A tibble: 5 x 2
+  continent promedio
+  &lt;chr&gt;        &lt;dbl&gt;
+1 Africa        48.9
+2 Americas      64.7
+3 Asia          60.1
+4 Europe        71.9
+5 Oceania       74.3
+```
+--
+- Lo más común es concatenar las funciones
+
+
+```r
+*summarise(group_by(pop, continent), promedio = mean(lifeExp))
+```
+
+```
+# A tibble: 5 x 2
+  continent promedio
+  &lt;chr&gt;        &lt;dbl&gt;
+1 Africa        48.9
+2 Americas      64.7
+3 Asia          60.1
+4 Europe        71.9
+5 Oceania       74.3
+```
+--
+- En la línea anterior anidamos funciones para obtener el promedio según barrios.
+- La anidación de funciones tiende a volver confuso el código...veremos luego cómo superar este inconveniente con el operador `%&gt;%`.
+
+---
+# Ejercicio (5')
+
+- Calcula la esperanza de vida al nacer promedio para Uruguay. 
+
+- Calcula la esperanza de vida al nacer promedio por continente para el año 2007.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>\n"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
